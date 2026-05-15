@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-themes="corporate-clean">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>讯飞AI文娱业务群 · 业务介绍</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;600;700;900&display=swap">
+<style>
+:root{--bg:#ffffff;--bg-soft:#f5f7fa;--surface:#ffffff;--surface-2:#f0f3f7;--border:rgba(10,37,64,.12);--border-strong:rgba(10,37,64,.28);--text-1:#0a2540;--text-2:#425466;--text-3:#8898aa;--accent:#0a2540;--accent-2:#1d4ed8;--accent-3:#64748b;--good:#0e9f6e;--warn:#d97706;--bad:#dc2626;--grad:linear-gradient(135deg,#0a2540,#1d4ed8);--grad-soft:linear-gradient(135deg,#f0f4fb,#e4ecf7);--radius:6px;--radius-sm:4px;--radius-lg:10px;--shadow:0 1px 3px rgba(10,37,64,.08),0 4px 12px rgba(10,37,64,.05);--shadow-lg:0 4px 12px rgba(10,37,64,.1),0 16px 40px rgba(10,37,64,.08);--font-sans:'Inter','Noto Sans SC',sans-serif;--font-display:'Inter','Noto Sans SC',sans-serif;--ease:cubic-bezier(.4,0,.2,1);--anim-dur:.7s;--anim-ease:cubic-bezier(.4,0,.2,1)}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text-1);font-family:var(--font-sans);font-weight:400;line-height:1.6;-webkit-font-smoothing:antialiased}
+img,svg,video{max-width:100%;display:block}
+.deck{position:relative;width:100vw;height:100vh;overflow:hidden;background:var(--bg)}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:72px 96px;box-sizing:border-box;opacity:0;pointer-events:none;transition:opacity .5s var(--ease),transform .5s var(--ease);transform:translateX(30px);overflow:hidden}
+.slide.is-active{opacity:1;pointer-events:auto;transform:translateX(0);z-index:2}
+.slide.is-prev{transform:translateX(-30px)}
+.notes{display:none!important}
+/* typography */
+.kicker{font-size:14px;font-weight:600;color:var(--accent-2);letter-spacing:.08em;text-transform:uppercase}
+h1.title,.h1{font-family:var(--font-display);font-size:64px;line-height:1.08;font-weight:800;letter-spacing:-.03em;margin:0 0 18px;color:var(--text-1)}
+h2.title,.h2{font-family:var(--font-display);font-size:48px;line-height:1.12;font-weight:700;letter-spacing:-.02em;margin:0 0 14px}
+h3,.h3{font-size:28px;line-height:1.2;font-weight:600;margin:0 0 10px}
+h4,.h4{font-size:20px;line-height:1.3;font-weight:600;margin:0 0 8px}
+.lede{font-size:20px;line-height:1.6;color:var(--text-2);font-weight:300;max-width:62ch}
+.dim{color:var(--text-2)}.dim2{color:var(--text-3)}
+.gradient-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+/* layout */
+.stack>*+*{margin-top:14px}
+.row{display:flex;gap:24px;align-items:center}
+.grid{display:grid;gap:24px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g5{grid-template-columns:repeat(5,1fr)}
+.center{display:flex;align-items:center;justify-content:center;text-align:center;flex-direction:column}
+.mt-s{margin-top:8px}.mt-m{margin-top:18px}.mt-l{margin-top:32px}.mt-xl{margin-top:48px}
+/* cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 26px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.card-accent{border-top:3px solid var(--accent-2)}
+.card-hover{transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.card-hover:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.pill{display:inline-block;padding:4px 14px;border-radius:999px;font-size:13px;font-weight:500;background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}
+.pill-accent{background:color-mix(in srgb,var(--accent-2) 12%,transparent);color:var(--accent-2);border-color:color-mix(in srgb,var(--accent-2) 28%,transparent)}
+/* chrome */
+.deck-header{position:absolute;top:24px;left:40px;right:40px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-3);letter-spacing:.12em;text-transform:uppercase;z-index:10;pointer-events:none}
+.deck-footer{position:absolute;bottom:24px;left:40px;right:40px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-3);z-index:10;pointer-events:none}
+.slide-number::before{content:attr(data-current)}
+.slide-number::after{content:" / " attr(data-total)}
+.progress-bar{position:fixed;left:0;right:0;bottom:0;height:3px;background:transparent;z-index:20}
+.progress-bar>span{display:block;height:100%;width:0;background:var(--accent-2);transition:width .3s var(--ease)}
+/* divider */
+.divider-accent{height:3px;width:72px;background:var(--accent-2);border-radius:2px}
+/* animations */
+@keyframes kf-fade-up{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:none}}
+@keyframes kf-fade-left{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:none}}
+@keyframes kf-rise{from{opacity:0;transform:translateY(60px) scale(.97);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+.anim-fade-up{animation:kf-fade-up var(--anim-dur) var(--anim-ease) both}
+.anim-fade-left{animation:kf-fade-left var(--anim-dur) var(--anim-ease) both}
+.anim-rise-in{animation:kf-rise .9s var(--anim-ease) both}
+.anim-stagger-list>*{opacity:0;animation:kf-rise .65s var(--anim-ease) both}
+.anim-stagger-list>*:nth-child(1){animation-delay:.05s}
+.anim-stagger-list>*:nth-child(2){animation-delay:.15s}
+.anim-stagger-list>*:nth-child(3){animation-delay:.25s}
+.anim-stagger-list>*:nth-child(4){animation-delay:.35s}
+.anim-stagger-list>*:nth-child(5){animation-delay:.45s}
+.anim-stagger-list>*:nth-child(6){animation-delay:.55s}
+/* custom: iflytek theme overrides */
+.cover-bg{position:absolute;inset:0;background:var(--grad-soft);z-index:0}
+.cover-blob{position:absolute;right:-120px;top:-120px;width:480px;height:480px;border-radius:50%;background:var(--grad);filter:blur(80px);opacity:.18;z-index:0}
+.slide>*{position:relative;z-index:1}
+.section-num{font-size:180px;font-weight:900;line-height:.9;color:var(--surface-2);position:absolute;right:60px;bottom:30px;z-index:0;letter-spacing:-.05em;opacity:.6}
+.metric{display:flex;flex-direction:column;gap:4px}
+.metric .n{font-size:56px;font-weight:900;letter-spacing:-.03em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.1}
+.metric .l{color:var(--text-2);font-size:14px}
+.flow-arrow{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.flow-step{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 20px;text-align:center;font-size:14px;font-weight:500}
+.flow-step.active{background:var(--accent-2);color:#fff;border-color:var(--accent-2)}
+.flow-connector{color:var(--text-3);font-size:20px}
+.tag-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+/* print */
+@media print{.slide{position:relative;opacity:1!important;transform:none!important;page-break-after:always;height:100vh}.deck-header,.deck-footer,.progress-bar{display:none!important}}
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- ==================== 1. 封面 ==================== -->
+<section class="slide" data-title="封面">
+  <div class="cover-bg"></div>
+  <div class="cover-blob"></div>
+  <p class="kicker" data-anim="fade-up">科大讯飞 · AI文娱业务群</p>
+  <h1 class="h1 anim-fade-up" data-anim="fade-up">以AI技术为驱动<br>构建文娱生态平台</h1>
+  <p class="lede mt-m">内容创造价值 · IP连接情感 · AI提升效率 · 数据驱动增长</p>
+  <div class="deck-footer"><span>讯飞AI文娱业务群</span><span class="slide-number" data-current="1" data-total="13"></span></div>
+  <div class="notes">封面页，介绍讯飞AI文娱业务群的整体定位。</div>
+</section>
+
+<!-- ==================== 2. 科大讯飞集团介绍 ==================== -->
+<section class="slide" data-title="科大讯飞集团介绍">
+  <span class="section-num">01</span>
+  <p class="kicker">集团概览</p>
+  <h2 class="h2 mt-s">科大讯飞 · 亚太领先的AI企业</h2>
+  <div class="grid g3 mt-l anim-stagger-list" data-anim="stagger-list">
+    <div class="card card-hover">
+      <h4>🏢 企业概况</h4>
+      <p class="dim" style="font-size:14px;margin-top:8px">2008年深交所上市（002230）<br>员工超15000人<br>全球领先的人工智能企业</p>
+    </div>
+    <div class="card card-hover">
+      <h4>🧠 核心技术</h4>
+      <p class="dim" style="font-size:14px;margin-top:8px">星火大模型<br>语音识别/合成<br>自然语言处理<br>计算机视觉</p>
+    </div>
+    <div class="card card-hover">
+      <h4>📊 业务版图</h4>
+      <p class="dim" style="font-size:14px;margin-top:8px">教育 · 医疗 · 智慧城市<br>开放平台 · 智能硬件<br>汽车 · 文娱</p>
+    </div>
+  </div>
+  <div class="divider-accent mt-l"></div>
+  <div class="mt-m">
+    <h4>文娱业务群在集团的战略定位</h4>
+    <div class="grid g2 mt-m">
+      <div class="card card-accent">
+        <p style="font-size:14px"><strong>C端流量入口</strong> — 输入法月活1.5亿，是讯飞最大的C端用户触达通道</p>
+      </div>
+      <div class="card card-accent">
+        <p style="font-size:14px"><strong>AI商业化试验田</strong> — AIGC、语音合成、大模型等技术在文娱场景率先落地变现</p>
+      </div>
+      <div class="card card-accent">
+        <p style="font-size:14px"><strong>"AI+内容"战略承载</strong> — 将AI能力转化为用户可感知的内容与娱乐体验</p>
+      </div>
+      <div class="card card-accent">
+        <p style="font-size:14px"><strong>生态协同枢纽</strong> — 为集团其他业务线提供内容供给、IP资产和用户运营能力</p>
+      </div>
+    </div>
+  </div>
+  <div class="notes">重点强调文娱业务群是讯飞C端流量入口和AI商业化前沿阵地。</div>
+</section>
+
+<!-- ==================== 3. 使命愿景 ==================== -->
+<section class="slide center" data-title="使命愿景">
+  <div class="cover-bg"></div>
+  <p class="kicker">使命愿景</p>
+  <h2 class="h2 mt-s" style="max-width:18ch;text-align:center" data-anim="fade-up">用科技共创美好世界<br>让生活娱乐更加舒适便捷</h2>
+  <div class="row mt-xl" style="gap:40px;justify-content:center">
+    <div class="metric" style="text-align:center"><div class="n">内容</div><div class="l">创造价值</div></div>
+    <div class="metric" style="text-align:center"><div class="n">IP</div><div class="l">连接情感</div></div>
+    <div class="metric" style="text-align:center"><div class="n">AI</div><div class="l">提升效率</div></div>
+    <div class="metric" style="text-align:center"><div class="n">数据</div><div class="l">驱动增长</div></div>
+  </div>
+  <div class="notes">文娱业务群的使命愿景和四大价值主张。</div>
+</section>
+
+<!-- ==================== 4. 业务全景概览 ==================== -->
+<section class="slide" data-title="业务全景概览">
+  <span class="section-num">02</span>
+  <p class="kicker">业务版图</p>
+  <h2 class="h2 mt-s">五大核心业务板块</h2>
+  <p class="lede">以AI技术为驱动，构建内容、IP与商业闭环的文娱生态平台</p>
+  <div class="grid g5 mt-l anim-stagger-list" data-anim="stagger-list">
+    <div class="card card-hover" style="text-align:center;padding:20px 14px">
+      <div style="font-size:32px;margin-bottom:8px">⌨️</div>
+      <h4 style="font-size:15px">讯飞输入法</h4>
+      <p class="dim2" style="font-size:12px;margin-top:4px">流量入口</p>
+    </div>
+    <div class="card card-hover" style="text-align:center;padding:20px 14px">
+      <div style="font-size:32px;margin-bottom:8px">🎵</div>
+      <h4 style="font-size:15px">讯飞音乐</h4>
+      <p class="dim2" style="font-size:12px;margin-top:4px">艺人IP源头</p>
+    </div>
+    <div class="card card-hover" style="text-align:center;padding:20px 14px">
+      <div style="font-size:32px;margin-bottom:8px">🦆</div>
+      <h4 style="font-size:15px">IP业务</h4>
+      <p class="dim2" style="font-size:12px;margin-top:4px">资产运营孵化</p>
+    </div>
+    <div class="card card-hover" style="text-align:center;padding:20px 14px">
+      <div style="font-size:32px;margin-bottom:8px">🎬</div>
+      <h4 style="font-size:15px">AI剧业务</h4>
+      <p class="dim2" style="font-size:12px;margin-top:4px">内容增长引擎</p>
+    </div>
+    <div class="card card-hover" style="text-align:center;padding:20px 14px">
+      <div style="font-size:32px;margin-bottom:8px">📺</div>
+      <h4 style="font-size:15px">视听娱乐</h4>
+      <p class="dim2" style="font-size:12px;margin-top:4px">分发渠道</p>
+    </div>
+  </div>
+  <div class="notes">五大业务板块总览，后续逐一展开。</div>
+</section>
+
+<!-- ==================== 5. 讯飞输入法 ==================== -->
+<section class="slide" data-title="讯飞输入法">
+  <span class="section-num">03</span>
+  <p class="kicker">核心业务</p>
+  <h2 class="h2 mt-s">讯飞输入法 · 流量入口和验证媒介</h2>
+  <div class="grid g3 mt-l">
+    <div class="metric"><div class="n">1.5亿</div><div class="l">月活跃用户</div></div>
+    <div class="metric"><div class="n">TOP3</div><div class="l">国内输入法市场份额</div></div>
+    <div class="metric"><div class="n">快速增长</div><div class="l">内容生态规模</div></div>
+  </div>
+  <div class="grid g3 mt-l anim-stagger-list" data-anim="stagger-list">
+    <div class="card card-hover"><h4>基于大模型的AI输入</h4><p class="dim" style="font-size:14px;margin-top:6px">星火大模型赋能，智能预测、智能纠错、AI写作助手</p></div>
+    <div class="card card-hover"><h4>个性装扮内容生态</h4><p class="dim" style="font-size:14px;margin-top:6px">皮肤、字体、表情包等个性化内容，连接IP资产</p></div>
+    <div class="card card-hover"><h4>流量广告变现</h4><p class="dim" style="font-size:14px;margin-top:6px">精准触达海量用户，高效商业化转化</p></div>
+  </div>
+  <div class="notes">讯飞输入法是文娱业务群最大的流量入口，月活1.5亿。</div>
+</section>
+
+<!-- ==================== 6. 讯飞音乐 ==================== -->
+<section class="slide" data-title="讯飞音乐">
+  <span class="section-num">04</span>
+  <p class="kicker">核心业务</p>
+  <h2 class="h2 mt-s">讯飞音乐 · 音乐和艺人IP源头</h2>
+  <p class="lede">中国排名前十音乐厂牌，综艺内容营销行业领先</p>
+  <div class="grid g4 mt-l anim-stagger-list" data-anim="stagger-list">
+    <div class="card card-hover" style="text-align:center">
+      <h4 style="font-size:15px">音乐内容创制</h4>
+      <p class="dim" style="font-size:13px;margin-top:6px">原创音乐制作与发行</p>
+    </div>
+    <div class="card card-hover" style="text-align:center">
+      <h4 style="font-size:15px">艺人经纪运营</h4>
+      <p class="dim" style="font-size:13px;margin-top:6px">签约艺人全链路管理</p>
+    </div>
+    <div class="card card-hover" style="text-align:center">
+      <h4 style="font-size:15px">音乐整合营销</h4>
+      <p class="dim" style="font-size:13px;margin-top:6px">品牌×音乐跨界合作</p>
+    </div>
+    <div class="card card-hover" style="text-align:center">
+      <h4 style="font-size:15px">版权商业运营</h4>
+      <p class="dim" style="font-size:13px;margin-top:6px">版权授权与商业化</p>
+    </div>
+  </div>
+  <div class="notes">讯飞音乐是文娱业务群的音乐和艺人IP源头。</div>
+</section>
+
+<!-- ==================== 7. IP业务 ==================== -->
+<section class="slide" data-title="IP业务">
+  <span class="section-num">05</span>
+  <p class="kicker">核心业务</p>
+  <h2 class="h2 mt-s">IP业务 · 资产运营和孵化中心</h2>
+  <div class="grid g2 mt-l">
+    <div>
+      <div class="grid g2 anim-stagger-list" data-anim="stagger-list">
+        <div class="metric"><div class="n">2000万+</div><div class="l">躺倒鸭粉丝</div></div>
+        <div class="metric"><div class="n">10+</div><div class="l">新兴IP矩阵</div></div>
+      </div>
+      <div class="mt-l">
+        <h4>核心能力</h4>
+        <div class="tag-row">
+          <span class="pill pill-accent">自有IP孵化</span>
+          <span class="pill pill-accent">AI潮玩宇宙</span>
+          <span class="pill pill-accent">全球化发行</span>
+          <span class="pill pill-accent">全渠道整合</span>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="display:flex;align-items:center;justify-content:center;min-height:200px;background:var(--bg-soft)">
+      <p class="dim2" style="font-size:14px">[ IP形象展示区 — 可插入图片 ]</p>
+    </div>
+  </div>
+  <div class="notes">IP业务以躺倒鸭为核心，构建多元IP资产矩阵。</div>
+</section>
+
+<!-- ==================== 8. AI剧业务 ==================== -->
+<section class="slide" data-title="AI剧业务">
+  <span class="section-num">06</span>
+  <p class="kicker">核心业务</p>
+  <h2 class="h2 mt-s">AI剧业务 · 内容和商业协同增长引擎</h2>
+  <p class="lede">打造顶尖AI剧厂牌，革新IP全新范式</p>
+  <div class="grid g3 mt-l anim-stagger-list" data-anim="stagger-list">
+    <div class="card card-hover">
+      <h4>AI剧规模化智能创作</h4>
+      <p class="dim" style="font-size:14px;margin-top:6px">AI辅助剧本生成、角色设计、场景构建，大幅提升创作效率</p>
+    </div>
+    <div class="card card-hover">
+      <h4>IP全维度联动运营</h4>
+      <p class="dim" style="font-size:14px;margin-top:6px">剧集IP与音乐、潮玩、游戏等多形态联动，最大化IP价值</p>
+    </div>
+    <div class="card card-hover">
+      <h4>全球化全渠道发行</h4>
+      <p class="dim" style="font-size:14px;margin-top:6px">覆盖国内外主流平台，多语言本地化，全球同步分发</p>
+    </div>
+  </div>
+  <div class="notes">AI剧业务是文娱业务群的内容增长引擎，利用AI技术革新内容创作。</div>
+</section>
+
+<!-- ==================== 9. 视听娱乐业务 ==================== -->
+<section class="slide" data-title="视听娱乐业务">
+  <span class="section-num">07</span>
+  <p class="kicker">核心业务</p>
+  <h2 class="h2 mt-s">视听娱乐业务 · 商业方案和分发渠道</h2>
+  <p class="lede">围绕音乐、视频、IP内容，设计不同渠道解决方案，开展分发与商业化变现</p>
+  <div class="grid g4 mt-l anim-stagger-list" data-anim="stagger-list">
+    <div class="card card-hover" style="text-align:center">
+      <h4 style="font-size:15px">音乐/视频/IP内容分发</h4>
+    </div>
+    <div class="card card-hover" style="text-align:center">
+      <h4 style="font-size:15px">会员权益包分发</h4>
+    </div>
+    <div class="card card-hover" style="text-align:center">
+      <h4 style="font-size:15px">个性化装扮分发</h4>
+    </div>
+    <div class="card card-hover" style="text-align:center">
+      <h4 style="font-size:15px">铃声/彩铃业务分发</h4>
+    </div>
+  </div>
+  <div class="notes">视听娱乐业务负责内容的商业化分发。</div>
+</section>
+
+<!-- ==================== 10. IP协同中台 ==================== -->
+<section class="slide" data-title="IP协同中台">
+  <span class="section-num">08</span>
+  <p class="kicker">战略核心</p>
+  <h2 class="h2 mt-s">IP协同中台</h2>
+  <p class="lede">统一IP管理 · 内容协同生产 · 跨业务分发 · 商业化统一变现</p>
+  <div class="grid g3 mt-l">
+    <div class="card">
+      <h4>多元IP资产</h4>
+      <div class="tag-row">
+        <span class="pill">音乐艺人IP</span>
+        <span class="pill">虚拟IP</span>
+        <span class="pill">内容IP</span>
+      </div>
+    </div>
+    <div class="card">
+      <h4>协同能力</h4>
+      <div class="tag-row">
+        <span class="pill pill-accent">IP共创</span>
+        <span class="pill pill-accent">内容共创</span>
+        <span class="pill pill-accent">用户运营</span>
+        <span class="pill pill-accent">数据洞察</span>
+        <span class="pill pill-accent">商业变现</span>
+      </div>
+    </div>
+    <div class="card">
+      <h4>分发矩阵</h4>
+      <div class="tag-row">
+        <span class="pill">输入法</span>
+        <span class="pill">音乐矩阵号</span>
+        <span class="pill">视频平台</span>
+        <span class="pill">手机厂商</span>
+        <span class="pill">社媒平台</span>
+      </div>
+    </div>
+  </div>
+  <div class="notes">IP协同中台是文娱业务群的战略核心，统一管理和分发IP资产。</div>
+</section>
+
+<!-- ==================== 11. AI技术与数据能力底座 ==================== -->
+<section class="slide" data-title="技术底座">
+  <span class="section-num">09</span>
+  <p class="kicker">能力底座</p>
+  <h2 class="h2 mt-s">AI技术与数据能力底座</h2>
+  <div class="grid g5 mt-l anim-stagger-list" data-anim="stagger-list">
+    <div class="card" style="text-align:center;padding:20px 12px">
+      <div style="font-size:28px;margin-bottom:6px">🤖</div>
+      <h4 style="font-size:14px">AI创作能力</h4>
+      <p class="dim2" style="font-size:12px;margin-top:4px">AIGC · 音乐生成<br>剧本生成</p>
+    </div>
+    <div class="card" style="text-align:center;padding:20px 12px">
+      <div style="font-size:28px;margin-bottom:6px">🎙️</div>
+      <h4 style="font-size:14px">语音技术</h4>
+      <p class="dim2" style="font-size:12px;margin-top:4px">语音识别 · 合成<br>声纹识别</p>
+    </div>
+    <div class="card" style="text-align:center;padding:20px 12px">
+      <div style="font-size:28px;margin-bottom:6px">📡</div>
+      <h4 style="font-size:14px">推荐算法</h4>
+      <p class="dim2" style="font-size:12px;margin-top:4px">个性化推荐<br>内容分发 · 精准触达</p>
+    </div>
+    <div class="card" style="text-align:center;padding:20px 12px">
+      <div style="font-size:28px;margin-bottom:6px">📊</div>
+      <h4 style="font-size:14px">数据洞察</h4>
+      <p class="dim2" style="font-size:12px;margin-top:4px">用户画像 · 行为分析<br>数据驱动</p>
+    </div>
+    <div class="card" style="text-align:center;padding:20px 12px">
+      <div style="font-size:28px;margin-bottom:6px">☁️</div>
+      <h4 style="font-size:14px">云计算能力</h4>
+      <p class="dim2" style="font-size:12px;margin-top:4px">弹性计算 · 大数据<br>安全合规</p>
+    </div>
+  </div>
+  <div class="notes">AI技术与数据能力底座支撑所有业务线。</div>
+</section>
+
+<!-- ==================== 12. 核心竞争力 ==================== -->
+<section class="slide" data-title="核心竞争力">
+  <span class="section-num">10</span>
+  <p class="kicker">为什么选择我们</p>
+  <h2 class="h2 mt-s">核心竞争力</h2>
+  <div class="grid g5 mt-l anim-stagger-list" data-anim="stagger-list">
+    <div class="card card-accent card-hover" style="text-align:center;padding:24px 14px">
+      <div style="font-size:28px;margin-bottom:8px">🧠</div>
+      <h4 style="font-size:15px">AI技术壁垒</h4>
+      <p class="dim" style="font-size:12px;margin-top:6px">星火大模型 + 语音核心技术，深厚技术护城河</p>
+    </div>
+    <div class="card card-accent card-hover" style="text-align:center;padding:24px 14px">
+      <div style="font-size:28px;margin-bottom:8px">📱</div>
+      <h4 style="font-size:15px">自有流量优势</h4>
+      <p class="dim" style="font-size:12px;margin-top:6px">1.5亿月活输入法，不依赖外部流量采买</p>
+    </div>
+    <div class="card card-accent card-hover" style="text-align:center;padding:24px 14px">
+      <div style="font-size:28px;margin-bottom:8px">⭐</div>
+      <h4 style="font-size:15px">IP资产积累</h4>
+      <p class="dim" style="font-size:12px;margin-top:6px">躺倒鸭等自有IP矩阵，粉丝基础超2000万</p>
+    </div>
+    <div class="card card-accent card-hover" style="text-align:center;padding:24px 14px">
+      <div style="font-size:28px;margin-bottom:8px">🔄</div>
+      <h4 style="font-size:15px">全链路闭环</h4>
+      <p class="dim" style="font-size:12px;margin-top:6px">从内容创作到分发变现，一站式能力覆盖</p>
+    </div>
+    <div class="card card-accent card-hover" style="text-align:center;padding:24px 14px">
+      <div style="font-size:28px;margin-bottom:8px">🏛️</div>
+      <h4 style="font-size:15px">集团资源协同</h4>
+      <p class="dim" style="font-size:12px;margin-top:6px">背靠讯飞集团，技术与品牌双重背书</p>
+    </div>
+  </div>
+  <div class="divider-accent mt-l"></div>
+  <p class="lede mt-m" style="font-size:16px">技术领先 × 流量自主 × IP丰富 × 链路完整 × 集团赋能 — 构建难以复制的竞争壁垒</p>
+  <div class="notes">核心竞争力总结，突出五大差异化优势。</div>
+</section>
+
+<!-- ==================== 13. 文娱生态价值闭环 ==================== -->
+<section class="slide" data-title="价值闭环">
+  <span class="section-num">11</span>
+  <p class="kicker">生态闭环</p>
+  <h2 class="h2 mt-s">文娱生态价值闭环</h2>
+  <div class="flow-arrow mt-l" style="justify-content:center">
+    <div class="flow-step">用户<br><span class="dim2" style="font-size:12px">触达与沉淀</span></div>
+    <span class="flow-connector">→</span>
+    <div class="flow-step active">流量入口<br><span style="font-size:12px;opacity:.8">输入法</span></div>
+    <span class="flow-connector">→</span>
+    <div class="flow-step">内容供给<br><span class="dim2" style="font-size:12px">音乐/IP/AI剧</span></div>
+    <span class="flow-connector">→</span>
+    <div class="flow-step">IP运营<br><span class="dim2" style="font-size:12px">多元IP资产沉淀</span></div>
+    <span class="flow-connector">→</span>
+    <div class="flow-step">商业变现<br><span class="dim2" style="font-size:12px">广告/会员/版权/分发</span></div>
+    <span class="flow-connector">→</span>
+    <div class="flow-step">价值反馈<br><span class="dim2" style="font-size:12px">内容升级+用户增长</span></div>
+  </div>
+  <div class="grid g4 mt-xl">
+    <div class="card" style="text-align:center;padding:16px">
+      <p style="font-size:14px;font-weight:600;color:var(--accent-2)">用户规模</p>
+      <p class="dim" style="font-size:13px">持续增长</p>
+    </div>
+    <div class="card" style="text-align:center;padding:16px">
+      <p style="font-size:14px;font-weight:600;color:var(--accent-2)">IP资产</p>
+      <p class="dim" style="font-size:13px">不断增值</p>
+    </div>
+    <div class="card" style="text-align:center;padding:16px">
+      <p style="font-size:14px;font-weight:600;color:var(--accent-2)">内容生态</p>
+      <p class="dim" style="font-size:13px">繁荣丰富</p>
+    </div>
+    <div class="card" style="text-align:center;padding:16px">
+      <p style="font-size:14px;font-weight:600;color:var(--accent-2)">商业能力</p>
+      <p class="dim" style="font-size:13px">稳健提升</p>
+    </div>
+  </div>
+  <div class="notes">文娱生态价值闭环展示了从用户到商业变现再到价值反馈的完整链路。</div>
+</section>
+
+<!-- ==================== 13. 合作展望 ==================== -->
+<section class="slide center" data-title="合作展望">
+  <div class="cover-bg"></div>
+  <div class="cover-blob" style="left:-120px;right:auto;bottom:-120px;top:auto"></div>
+  <p class="kicker">期待合作</p>
+  <h2 class="h2 mt-s gradient-text" style="font-size:56px" data-anim="fade-up">携手共建AI文娱新生态</h2>
+  <p class="lede mt-m" style="text-align:center;max-width:50ch">以AI技术为驱动，以内容和IP为核心<br>共同探索文娱产业的无限可能</p>
+  <div class="row mt-xl" style="gap:16px;justify-content:center">
+    <span class="pill pill-accent">内容合作</span>
+    <span class="pill pill-accent">IP授权</span>
+    <span class="pill pill-accent">技术赋能</span>
+    <span class="pill pill-accent">渠道分发</span>
+  </div>
+  <p class="dim2 mt-l" style="font-size:14px">联系我们：讯飞AI文娱业务群</p>
+  <div class="notes">结尾页，展示合作方向和联系方式。</div>
+</section>
+
+</div>
+<script>
+/* Minimal deck runtime — keyboard navigation + progress bar */
+(function(){
+  'use strict';
+  function ready(fn){if(document.readyState!='loading')fn();else document.addEventListener('DOMContentLoaded',fn);}
+  ready(function(){
+    var deck=document.querySelector('.deck');if(!deck)return;
+    var slides=Array.from(deck.querySelectorAll('.slide'));if(!slides.length)return;
+    var idx=0,total=slides.length;
+    var bar=document.querySelector('.progress-bar');
+    if(!bar){bar=document.createElement('div');bar.className='progress-bar';bar.innerHTML='<span></span>';document.body.appendChild(bar);}
+    var barFill=bar.querySelector('span');
+    function go(n){
+      n=Math.max(0,Math.min(total-1,n));
+      slides.forEach(function(s,i){s.classList.toggle('is-active',i===n);s.classList.toggle('is-prev',i<n);});
+      idx=n;barFill.style.width=((n+1)/total*100)+'%';
+      var numEl=document.querySelector('.slide-number');
+      if(numEl){numEl.setAttribute('data-current',n+1);numEl.setAttribute('data-total',total);}
+      history.replaceState(null,'','#/'+(n+1));
+      // re-trigger animations
+      slides[n].querySelectorAll('[data-anim]').forEach(function(el){
+        var a=el.getAttribute('data-anim');
+        el.classList.remove('anim-'+a);void el.offsetWidth;el.classList.add('anim-'+a);
+      });
+    }
+    function fullscreen(){var el=document.documentElement;if(!document.fullscreenElement)el.requestFullscreen&&el.requestFullscreen();else document.exitFullscreen&&document.exitFullscreen();}
+    document.addEventListener('keydown',function(e){
+      if(e.metaKey||e.ctrlKey||e.altKey)return;
+      switch(e.key){
+        case'ArrowRight':case' ':case'PageDown':case'Enter':go(idx+1);e.preventDefault();break;
+        case'ArrowLeft':case'PageUp':case'Backspace':go(idx-1);e.preventDefault();break;
+        case'Home':go(0);break;case'End':go(total-1);break;
+        case'f':case'F':fullscreen();break;
+      }
+    });
+    // touch swipe support
+    var tx=0;
+    deck.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;});
+    deck.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){dx<0?go(idx+1):go(idx-1);}});
+    // click navigation (left 30% = prev, right 70% = next)
+    deck.addEventListener('click',function(e){if(e.target.closest('a,button,.pill'))return;var x=e.clientX/window.innerWidth;x<0.3?go(idx-1):go(idx+1);});
+    // hash deep-link
+    var m=/^#\/(\d+)/.exec(location.hash||'');if(m)idx=Math.max(0,parseInt(m[1],10)-1);
+    go(idx);
+  });
+})();
+</script>
+</body>
+</html>
